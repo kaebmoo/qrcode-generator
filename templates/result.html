@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Result</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .main-container {
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .ui.segment {
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 3em !important;
+            background: white !important;
+        }
+        
+        .qr-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 2em 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .qr-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        
+        .qr-image:hover {
+            opacity: 0.95;
+        }
+        
+        .success-icon {
+            color: #21ba45;
+            margin-bottom: 10px !important;
+        }
+        
+        .title-header {
+            color: #333;
+            margin-bottom: 0.5em !important;
+        }
+        
+        .input-text {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 1em 0;
+            word-break: break-all;
+            color: #555;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .ui.button {
+            border-radius: 8px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0.5em;
+        }
+        
+        .ui.primary.button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        
+        .ui.green.button {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border: none;
+            color: white;
+        }
+        
+        .ui.button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .action-buttons {
+            margin-top: 2em;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: none;
+            max-width: 300px;
+        }
+        
+        .download-info {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 1em;
+        }
+        
+        #copyButton.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .copy-hint {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 0.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="ui raised segment">
+            <div class="ui center aligned container">
+                <i class="huge check circle icon success-icon"></i>
+                <h1 class="ui header title-header">
+                    QR Code สร้างสำเร็จ!
+                    <div class="sub header">QR Code ของคุณพร้อมใช้งานแล้ว</div>
+                </h1>
+            </div>
+            
+            <div class="input-text">
+                <strong>ข้อมูล:</strong> {{ text }}
+            </div>
+            
+            <div class="qr-container">
+                <img id="qrImage" 
+                     src="data:image/png;base64,{{ qr_image }}" 
+                     alt="QR Code" 
+                     class="qr-image"
+                     title="คลิกเพื่อดาวน์โหลด">
+                <div class="download-info">
+                    <i class="info circle icon"></i> 
+                    คลิกที่รูป หรือใช้ปุ่มด้านล่างเพื่อดาวน์โหลด
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="ui green button fluid large" onclick="downloadQR()">
+                    <i class="download icon"></i> ดาวน์โหลด QR Code
+                </button>
+                
+                <div class="ui two buttons">
+                    <button id="copyButton" class="ui button" onclick="copyImageToClipboard()">
+                        <i class="copy icon"></i> คัดลอกรูป
+                    </button>
+                    <a href="/" class="ui primary button">
+                        <i class="redo icon"></i> สร้างใหม่
+                    </a>
+                </div>
+                <div id="copyHint" class="copy-hint" style="display: none;">
+                    <i class="info circle icon"></i> หรือคลิกขวาที่รูปแล้วเลือก "Copy Image"
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notifications -->
+    <div class="ui green message notification" id="successNotification">
+        <i class="check icon"></i> <span id="notificationText">คัดลอกรูปแล้ว!</span>
+    </div>
+    
+    <div class="ui yellow message notification" id="warningNotification">
+        <i class="exclamation triangle icon"></i> <span id="warningText"></span>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.js"></script>
+    <script>
+        // Detect browser
+        function detectBrowser() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            if (userAgent.indexOf('safari') > -1 && userAgent.indexOf('chrome') === -1) {
+                return 'safari';
+            } else if (userAgent.indexOf('chrome') > -1) {
+                return 'chrome';
+            } else if (userAgent.indexOf('firefox') > -1) {
+                return 'firefox';
+            } else if (userAgent.indexOf('edge') > -1) {
+                return 'edge';
+            }
+            return 'other';
+        }
+        
+        // Check clipboard API support
+        function checkClipboardSupport() {
+            const browser = detectBrowser();
+            const hasClipboardAPI = navigator.clipboard && window.ClipboardItem;
+            const isSecureContext = window.isSecureContext;
+            
+            if (browser === 'safari' || !hasClipboardAPI || !isSecureContext) {
+                // Show hint for Safari or unsupported browsers
+                $('#copyHint').show();
+                if (browser === 'safari') {
+                    $('#copyButton').html('<i class="copy icon"></i> คัดลอกรูป (Safari ไม่รองรับ)');
+                }
+            }
+            
+            return hasClipboardAPI && isSecureContext && browser !== 'safari';
+        }
+        
+        // Click on image to download
+        document.getElementById('qrImage').addEventListener('click', function() {
+            downloadQR();
+        });
+        
+        function downloadQR() {
+            const link = document.createElement('a');
+            link.download = 'qrcode_' + Date.now() + '.png';
+            link.href = document.getElementById('qrImage').src;
+            link.click();
+            showNotification('success', 'กำลังดาวน์โหลด QR Code...');
+        }
+        
+        async function copyImageToClipboard() {
+            const canCopy = checkClipboardSupport();
+            
+            if (!canCopy) {
+                showNotification('warning', 'กรุณาคลิกขวาที่รูปแล้วเลือก "Copy Image" สำหรับ Safari');
+                return;
+            }
+            
+            try {
+                const img = document.getElementById('qrImage');
+                const response = await fetch(img.src);
+                const blob = await response.blob();
+                
+                const item = new ClipboardItem({ 'image/png': blob });
+                await navigator.clipboard.write([item]);
+                showNotification('success', 'คัดลอกรูปแล้ว! พร้อมวางในที่ต่างๆ');
+            } catch (err) {
+                console.error('Failed to copy image:', err);
+                showNotification('warning', 'ไม่สามารถคัดลอกรูปได้ กรุณาคลิกขวาแล้วเลือก "Copy Image"');
+            }
+        }
+        
+        function showNotification(type, text) {
+            if (type === 'success') {
+                $('#notificationText').text(text);
+                $('#successNotification').fadeIn(300).delay(3000).fadeOut(300);
+            } else if (type === 'warning') {
+                $('#warningText').text(text);
+                $('#warningNotification').fadeIn(300).delay(4000).fadeOut(300);
+            }
+        }
+        
+        // Initialize on load
+        $(document).ready(function() {
+            $('.qr-image').hide().fadeIn(500);
+            checkClipboardSupport();
+        });
+    </script>
+</body>
+</html>

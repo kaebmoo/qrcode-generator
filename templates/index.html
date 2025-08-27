@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .main-container {
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .ui.segment {
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 3em !important;
+            background: white !important;
+        }
+        
+        .header-icon {
+            color: #764ba2;
+            margin-bottom: 10px !important;
+        }
+        
+        .title-header {
+            color: #333;
+            margin-bottom: 0.5em !important;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 2em !important;
+        }
+        
+        .ui.primary.button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .ui.primary.button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .features {
+            margin-top: 3em;
+            padding-top: 2em;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .feature-item {
+            text-align: center;
+            margin-bottom: 1.5em;
+        }
+        
+        .feature-item i {
+            color: #764ba2;
+            margin-bottom: 0.5em !important;
+        }
+        
+        .feature-item h4 {
+            color: #333;
+            margin-bottom: 0.3em !important;
+        }
+        
+        .feature-item p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        textarea {
+            border-radius: 8px !important;
+            border: 1px solid #ddd !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        textarea:focus {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+        }
+        
+        .ui.checkbox label {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="ui raised segment">
+            <div class="ui center aligned container">
+                <i class="huge qrcode icon header-icon"></i>
+                <h1 class="ui header title-header">
+                    QR Code Generator
+                    <div class="sub header subtitle">สร้าง QR Code สำหรับข้อความหรือ URL ของคุณ</div>
+                </h1>
+            </div>
+            
+            <form class="ui form" action="/generate" method="POST">
+                <div class="field">
+                    <label><i class="text height icon"></i> ข้อความหรือ URL</label>
+                    <textarea 
+                        name="text" 
+                        rows="4" 
+                        placeholder="ใส่ข้อความหรือ URL ที่ต้องการสร้าง QR Code..."
+                        required
+                        maxlength="2000"
+                    ></textarea>
+                    <small style="color: #888;">รองรับข้อความสูงสุด 2,000 ตัวอักษร</small>
+                </div>
+                
+                <div class="field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" name="with_logo" value="true" checked>
+                        <label>เพิ่มโลโก้ตรงกลาง QR Code</label>
+                    </div>
+                </div>
+                
+                <button class="ui primary button fluid large" type="submit">
+                    <i class="magic icon"></i> สร้าง QR Code
+                </button>
+            </form>
+            
+            <div class="features">
+                <div class="ui three column grid">
+                    <div class="column feature-item">
+                        <i class="huge thin lightning icon"></i>
+                        <h4>รวดเร็ว</h4>
+                        <p>สร้าง QR Code ได้ทันที</p>
+                    </div>
+                    <div class="column feature-item">
+                        <i class="huge thin shield alternate icon"></i>
+                        <h4>ปลอดภัย</h4>
+                        <p>ไม่เก็บข้อมูลของคุณ</p>
+                    </div>
+                    <div class="column feature-item">
+                        <i class="huge thin download icon"></i>
+                        <h4>ดาวน์โหลดฟรี</h4>
+                        <p>บันทึกเป็นไฟล์ PNG คุณภาพสูง</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.ui.checkbox').checkbox();
+            
+            // Auto-resize textarea
+            $('textarea').on('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        });
+    </script>
+</body>
+</html>
