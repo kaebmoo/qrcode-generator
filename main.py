@@ -39,9 +39,9 @@ def generate_qr_code(data: str, with_logo: bool = True):
     
     # Add logo if requested and file exists
     if with_logo:
-        # logo_path = os.path.join('static', '01_NT-Logo.png')
-        script_dir = os.path.dirname(os.path.realpath(__file__))
-        logo_path = os.path.join(script_dir, 'static', '01_NT-Logo.png')
+        logo_path = os.path.join('static', '01_NT-Logo.png')
+        # script_dir = os.path.dirname(os.path.realpath(__file__))
+        # logo_path = os.path.join(script_dir, 'static', '01_NT-Logo.png')
         if os.path.exists(logo_path):
             try:
                 logo = Image.open(logo_path)
