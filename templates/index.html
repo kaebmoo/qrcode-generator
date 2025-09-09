@@ -109,7 +109,7 @@
                 </h1>
             </div>
             
-            <form class="ui form" action="/generate" method="POST">
+            <form class="ui form" action="{{ url_for('generate') }}" method="POST">
                 <div class="field">
                     <label><i class="text height icon"></i> ข้อความหรือ URL</label>
                     <textarea 

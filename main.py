@@ -9,7 +9,8 @@ from qrcodegen import QrCode
 import os
 from typing import Optional
 
-app = FastAPI(title="QR Code Generator")
+# app = FastAPI(title="QR Code Generator")
+app = FastAPI(title="QR Code Generator", root_path="/qrcode")
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -38,7 +39,9 @@ def generate_qr_code(data: str, with_logo: bool = True):
     
     # Add logo if requested and file exists
     if with_logo:
-        logo_path = os.path.join('static', '01_NT-Logo.png')
+        # logo_path = os.path.join('static', '01_NT-Logo.png')
+        script_dir = os.path.dirname(os.path.realpath(__file__))
+        logo_path = os.path.join(script_dir, 'static', '01_NT-Logo.png')
         if os.path.exists(logo_path):
             try:
                 logo = Image.open(logo_path)
@@ -145,4 +148,4 @@ async def download_qr(text: str, with_logo: bool = True):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8888)

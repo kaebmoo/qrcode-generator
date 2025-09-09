@@ -29,10 +29,10 @@ python main.py
 
 หรือใช้ uvicorn:
 ```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8080
+uvicorn main:app --reload --host 0.0.0.0 --port 8888
 ```
 
-4. เปิดเบราว์เซอร์ไปที่: `http://localhost:8080`
+4. เปิดเบราว์เซอร์ไปที่: `http://localhost:8888`
 
 ## การใช้งาน
 
